@@ -14,14 +14,14 @@ contract Exchange is ERC20 {
         cryptoDevTokenAddress = _CryptoDevtoken;
     }
 
-    function getReserve() public view returns (uint256) {
+    function getReserve() public view returns (uint) {
         return ERC20(cryptoDevTokenAddress).balanceOf(address(this));
     }
 
-    function addLiquidity(uint256 _amount) public payable returns (uint256) {
-        uint256 liquidity;
-        uint256 ethBalance = address(this).balance;
-        uint256 cryptoDevTokenReserve = getReserve();
+    function addLiquidity(uint _amount) public payable returns (uint) {
+        uint liquidity;
+        uint ethBalance = address(this).balance;
+        uint cryptoDevTokenReserve = getReserve();
         ERC20 cryptoDevToken = ERC20(cryptoDevTokenAddress);
 
         if (cryptoDevTokenReserve == 0) {
@@ -29,8 +29,8 @@ contract Exchange is ERC20 {
             liquidity = ethBalance;
             _mint(msg.sender, liquidity);
         } else {
-            uint256 ethReserve = ethBalance - msg.value;
-            uint256 cryptoDevTokenAmount = (msg.value * cryptoDevTokenReserve) /
+            uint ethReserve = ethBalance - msg.value;
+            uint cryptoDevTokenAmount = (msg.value * cryptoDevTokenReserve) /
                 (ethReserve);
             require(
                 _amount >= cryptoDevTokenAmount,
@@ -47,12 +47,12 @@ contract Exchange is ERC20 {
         return liquidity;
     }
 
-    function removeLiqudity(uint256 _amount) public returns (uint256, uint256) {
+    function removeLiqudity(uint _amount) public returns (uint, uint) {
         require(_amount > 0, "_amount has to be greater than 0");
-        uint256 ethReserve = address(this).balance;
-        uint256 _totalSupply = totalSupply();
-        uint256 ethAmount = (ethReserve * _amount) / _totalSupply;
-        uint256 cryptoDevTokenAmount = (getReserve() * _amount) / _totalSupply;
+        uint ethReserve = address(this).balance;
+        uint _totalSupply = totalSupply();
+        uint ethAmount = (ethReserve * _amount) / _totalSupply;
+        uint cryptoDevTokenAmount = (getReserve() * _amount) / _totalSupply;
 
         _burn(msg.sender, _amount);
 
@@ -75,7 +75,7 @@ contract Exchange is ERC20 {
         return numerator / denominator;
     }
 
-    function ethToCryptoDevToken(uint256 _mintToken) public payable {
+    function ethToCryptoDevToken(uint _mintToken) public payable {
         uint256 tokenReserve = getReserve();
 
         uint256 tokensBought = getAmountOfTokens(
@@ -89,7 +89,7 @@ contract Exchange is ERC20 {
         ERC20(cryptoDevTokenAddress).transfer(msg.sender, tokensBought);
     }
 
-    function cryptoDevTokenToEth(uint256 _tokensSold, uint256 _minEth) public {
+    function cryptoDevTokenToEth(uint _tokensSold, uint _minEth) public {
         uint256 tokenReserve = getReserve();
 
         uint256 ethBought = getAmountOfTokens(
@@ -109,4 +109,4 @@ contract Exchange is ERC20 {
     }
 }
 
-//exchange contract address:  0x1bAc0653CBA01B58104485D0fa81a1aB472A25A3
+//exchange contract address:  0x34104AE419FB75362B6DE56981FC3ad889630aaD
