@@ -109,4 +109,4 @@ contract Exchange is ERC20 {
     }
 }
 
-//exchange contract address:  0x769a729e6d6a0E887CAC0D35198706b249F95F30
+//exchange contract address:  0x00aeA7B970Fd04f7Bf27b04B1a17F5DDd8Ff19F1
