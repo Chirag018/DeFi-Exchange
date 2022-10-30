@@ -42,7 +42,7 @@ export default function Home() {
       const _reservedCD = await getReserveOfCDTokens(provider);
       // console.log(_cdBalance);
       const _ethBalanceContract = await getEtherBalance(provider, null, true);
-      // console.log(_cdBalance);
+      console.log(_reservedCD);
       setEtherBalance(_ethBalance);
       setCDBalance(_cdBalance);
       setLPBalance(_lpBalance);
