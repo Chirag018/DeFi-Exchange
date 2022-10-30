@@ -1,3 +1,5 @@
+// use to retrieve balances & reserves for assets
+
 import { Contract } from 'ethers';
 import { EXCHANGE_CONTRACT_ABI, EXCHANGE_CONTRACT_ADDRESS, TOKEN_CONTRACT_ABI, TOKEN_CONTRACT_ADDRESS } from '../constants';
 
@@ -7,9 +9,13 @@ export const getEtherBalance = async (provider, address, contract = false) => {
             const balance = await provider.getBalance(EXCHANGE_CONTRACT_ADDRESS);
             return balance;
         }
+        else {
+            const balance = await provider.getBalance(address);
+            return balance;
+        }
     }
-    catch (e) {
-        console.error(e);
+    catch (error) {
+        console.error(error);
         return 0;
     }
 }
@@ -18,10 +24,11 @@ export const getCDTokensBalance = async (provider, address) => {
     try {
         const tokenContract = new Contract(TOKEN_CONTRACT_ADDRESS, TOKEN_CONTRACT_ABI, provider);
         const balanceOfCryptoDevTokens = await tokenContract.balanceOf(address);
+        console.log(balanceOfCryptoDevTokens);
         return balanceOfCryptoDevTokens;
     }
-    catch (e) {
-        console.error(e);
+    catch (err) {
+        console.error(err);
     }
 }
 
@@ -31,8 +38,8 @@ export const getLPTokensBalance = async (provider, address) => {
         const balanceOfLPTokens = await exchangeContract.balanceOf(address);
         return balanceOfLPTokens;
     }
-    catch (e) {
-        console.error(e);
+    catch (error) {
+        console.error(error);
     }
 }
 
@@ -42,7 +49,7 @@ export const getReserveOfCDTokens = async (provider) => {
         const reserve = await exchangeContract.getReserve();
         return reserve;
     }
-    catch (e) {
-        console.error(e);
+    catch (err) {
+        console.error(err);
     }
 }

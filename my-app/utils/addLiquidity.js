@@ -1,4 +1,4 @@
-import { Contract, utils } from 'ethers';
+import { BigNumber, Contract, utils } from 'ethers';
 import { EXCHANGE_CONTRACT_ABI, EXCHANGE_CONTRACT_ADDRESS, TOKEN_CONTRACT_ABI, TOKEN_CONTRACT_ADDRESS } from '../constants';
 
 export const addLiquidity = async (signer, addCDAmountWei, addEtherAmountWei) => {
@@ -13,8 +13,8 @@ export const addLiquidity = async (signer, addCDAmountWei, addEtherAmountWei) =>
         })
         await tx.wait();
     }
-    catch (e) {
-        console.error(e);
+    catch (error) {
+        console.error(error);
     }
 }
 
@@ -22,7 +22,7 @@ export const calculateCD = async (_addEther = '0', etherBalanceContract, cdToken
     const _addEtherAmountWei = utils.parseEther(_addEther);
 
     const cryptoDevTokenAmount = _addEtherAmountWei
-        .mul(cdTokenReserve)
+        .mul(BigNumber.from(cdTokenReserve))
         .div(etherBalanceContract);
     return cryptoDevTokenAmount;
 }

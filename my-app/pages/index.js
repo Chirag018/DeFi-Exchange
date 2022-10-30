@@ -14,7 +14,7 @@ export default function Home() {
   const [liquidityTab, setLiquidityTab] = useState(true);
   const zero = BigNumber.from(0);
   const [ethBalance, setEtherBalance] = useState(zero);
-  const [reserveCD, setReservedCD] = useState(zero)
+  const [reservedCD, setReservedCD] = useState(zero)
   const [etherBalanceContract, setEtherBalanceContract] = useState(zero);
   const [cdBalance, setCDBalance] = useState(zero);
   const [lpBalance, setLPBalance] = useState(zero);
@@ -35,21 +35,24 @@ export default function Home() {
       const provider = await getProviderOrSigner(false);
       const signer = await getProviderOrSigner(true);
       const address = await signer.getAddress();
+      console.log(address);
       const _ethBalance = await getEtherBalance(provider, address);
       const _cdBalance = await getCDTokensBalance(provider, address);
       const _lpBalance = await getLPTokensBalance(provider, address);
       const _reservedCD = await getReserveOfCDTokens(provider);
+      // console.log(_cdBalance);
       const _ethBalanceContract = await getEtherBalance(provider, null, true);
+      // console.log(_cdBalance);
       setEtherBalance(_ethBalance);
       setCDBalance(_cdBalance);
       setLPBalance(_lpBalance);
       setReservedCD(_reservedCD);
-      setReservedCD(_reservedCD)
+      // setReservedCD(_reservedCD);
+      // console.log(await getReserveOfCDTokens(_reservedCD));
       setEtherBalanceContract(_ethBalanceContract);
-
     }
-    catch (e) {
-      console.error(e);
+    catch (error) {
+      console.error(error);
     }
   }
 
@@ -78,7 +81,7 @@ export default function Home() {
       if (!_swapAmountWei.eq(zero)) {
         const provider = await getProviderOrSigner();
         const _ethBalance = await getEtherBalance(provider, null, true);
-        const amountOfTokens = await getAmountOfTokensReceivedFromSwap(_swapAmountWei, provider, ethSelected, _ethBalance, reserveCD);
+        const amountOfTokens = await getAmountOfTokensReceivedFromSwap(_swapAmountWei, provider, ethSelected, _ethBalance, reservedCD);
 
         settokenToBeReceivedAfterSwap(amountOfTokens);
       }
@@ -174,6 +177,7 @@ export default function Home() {
       const signer = web3Provider.getSigner();
       return signer;
     }
+    return web3Provider;
   }
 
   useEffect(() => {
@@ -189,7 +193,6 @@ export default function Home() {
   }, [walletConnected]);
 
   const renderButton = () => {
-    // If wallet is not connected, return a button which allows them to connect their wllet
     if (!walletConnected) {
       return (
         <button onClick={connectWallet} className={styles.button}>
@@ -198,10 +201,11 @@ export default function Home() {
       );
     }
 
-    // If we are currently waiting for something, return a loading button
     if (loading) {
       return <button className={styles.button}>Loading...</button>;
     }
+
+    // console.log(reservedCD);
 
     if (liquidityTab) {
       return (
@@ -209,18 +213,14 @@ export default function Home() {
           <div className={styles.description}>
             You have:
             <br />
-            {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
-            { utils.formatEther(cdBalance)} Crypto Dev Tokens
+            {utils.formatEther(cdBalance)} Crypto Dev Tokens
             <br />
             {utils.formatEther(ethBalance)} Ether
             <br />
             {utils.formatEther(lpBalance)} Crypto Dev LP tokens
           </div>
           <div>
-            {/* If reserved CD is zero, render the state for liquidity zero where we ask the user
-            how much initial liquidity he wants to add else just render the state where liquidity is not zero and
-            we calculate based on the `Eth` amount specified by the user how much `CD` tokens can be added */}
-            {utils.parseEther(reserveCD.toString()).eq(zero) ? (
+            {utils.parseEther(reservedCD.toString()).eq(zero) ? (
               <div>
                 <input
                   type="number"
@@ -249,8 +249,6 @@ export default function Home() {
                   placeholder="Amount of Ether"
                   onChange={async (e) => {
                     setAddEther(e.target.value || "0");
-                    // calculate the number of CD tokens that
-                    // can be added given  `e.target.value` amount of Eth
                     const _addCDTokens = await calculateCD(
                       e.target.value || "0",
                       etherBalanceContract,
@@ -261,7 +259,6 @@ export default function Home() {
                   className={styles.input}
                 />
                 <div className={styles.inputDiv}>
-                  {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
                   {`You will need ${utils.formatEther(addCDTokens)} Crypto Dev
                   Tokens`}
                 </div>
@@ -276,14 +273,11 @@ export default function Home() {
                 placeholder="Amount of LP Tokens"
                 onChange={async (e) => {
                   setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would receive
-                  // After he removes `e.target.value` amount of `LP` tokens
                   await _getTokensAfterRemove(e.target.value || "0");
                 }}
                 className={styles.input}
               />
               <div className={styles.inputDiv}>
-                {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
                 {`You will get ${utils.formatEther(removeCD)} Crypto
               Dev Tokens and ${utils.formatEther(removeEther)} Eth`}
               </div>
@@ -302,7 +296,6 @@ export default function Home() {
             placeholder="Amount"
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would receive after the swap
               await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
             }}
             className={styles.input}
@@ -314,7 +307,6 @@ export default function Home() {
             id="dropdown"
             onChange={async () => {
               setEthSelected(!ethSelected);
-              // Initialize the values back to zero
               await _getAmountOfTokensReceivedFromSwap(0);
               setSwapAmount("");
             }}
@@ -324,7 +316,6 @@ export default function Home() {
           </select>
           <br />
           <div className={styles.inputDiv}>
-            {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
             {ethSelected
               ? `You will get ${utils.formatEther(
                 tokenToBeReceivedAfterSwap

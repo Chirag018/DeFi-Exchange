@@ -20,7 +20,7 @@ export const getTokensAfterRemove = async (provider, removeLPTokensWei, _ethBala
             _removeCD,
         }
     }
-    catch (e) {
-        console.error(e);
+    catch (error) {
+        console.error(error);
     }
 }
